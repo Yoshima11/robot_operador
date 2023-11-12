@@ -48,8 +48,6 @@ else:
 
 def market_data_handler(message):
     print("Market Data Message Received: {0}".format(message))
-    global mensaje
-    mensaje = message
 def order_report_handler(message):
     print("Order Report Message Received: {0}".format(message))
 def error_handler(message):
