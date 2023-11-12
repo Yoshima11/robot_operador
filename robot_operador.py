@@ -3,6 +3,7 @@ import argparse #para ingresar argumentos al iniciar el programa
 import time
 from datetime import datetime
 import pandas as pd
+import simplejson as sj
 import matplotlib.pyplot as plt
 import pyRofex as pr
 
@@ -28,6 +29,8 @@ if(str(args.environment).upper()=='LIVE'):
     except Exception as error:
         print('Fallo de autenticación del entorno LIVE.')
         print(error)
+        parser.print_help()
+        exit()
 else:
     try:
         pr.initialize(
@@ -40,6 +43,8 @@ else:
     except Exception as error:
         print('Fallo de autenticación del entorno REMARKET.')
         print(error)
+        parser.print_help()
+        exit()
 
 def market_data_handler(message):
     print("Market Data Message Received: {0}".format(message))
@@ -72,5 +77,5 @@ pr.market_data_subscription(
     entries=datos_ticker,
 )
 
-input('apreta enter')
+time.sleep(1)
 pr.close_websocket_connection()
