@@ -6,8 +6,8 @@ import pandas as pd
 import simplejson as sj
 import matplotlib.pyplot as plt
 import pyRofex as pr
-import conexion
-#import datos_ticker
+from conexion import iniciar
+from datos_ticker import datos_ticker
 
 # recibe argumentos al ejecutar el programa.
 parser = argparse.ArgumentParser(description='Robot de trading para Matba Rofex')
@@ -18,10 +18,14 @@ parser.add_argument('-p','--password')
 parser.add_argument('-e','--environment', help='Environment LIVE or REMARKET. Por defecto es REMARKET')
 args = parser.parse_args()
 
-conexion.conexion.iniciar(user=str(args.user), password=str(args.password), account=str(args.account), environment=str(args.environment))
+iniciar(user=str(args.user), password=str(args.password), account=str(args.account), environment=str(args.environment))
+
 while True:
     try:
+        datos_ticker(str(args.ticker))
         time.sleep(1)
+        print('Ctrl+c para salir.')
+
     except KeyboardInterrupt:
         print("Saliendo...")
         break
