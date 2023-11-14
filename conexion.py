@@ -7,7 +7,7 @@ def env(environment):
     else:
         return pr.Environment.REMARKET
 
-def iniciar(user, password, account, environment):
+def conectar(user, password, account, environment):
     try:
         pr.initialize(
             user=user,

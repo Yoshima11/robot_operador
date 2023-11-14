@@ -6,7 +6,7 @@ import pandas as pd
 import simplejson as sj
 import matplotlib.pyplot as plt
 import pyRofex as pr
-from conexion import iniciar
+from conexion import conectar
 from datos_ticker import datos_ticker
 
 # recibe argumentos al ejecutar el programa.
@@ -18,14 +18,19 @@ parser.add_argument('-p','--password')
 parser.add_argument('-e','--environment', help='Environment LIVE or REMARKET. Por defecto es REMARKET')
 args = parser.parse_args()
 
-iniciar(user=str(args.user), password=str(args.password), account=str(args.account), environment=str(args.environment))
+conectar(
+    user=args.user,
+    password=args.password,
+    account=args.account,
+    environment=args.environment,
+)
 
 while True:
     try:
-        datos_ticker(str(args.ticker))
+        datos = datos_ticker(args.ticker)
+        print(datos)
         time.sleep(1)
-        print('Ctrl+c para salir.')
-
+        input('<Enter> para continuar o <Ctrl+C> para salir')
     except KeyboardInterrupt:
         print("Saliendo...")
         break
