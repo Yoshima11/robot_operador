@@ -6,6 +6,8 @@ import pandas as pd
 import simplejson as sj
 import matplotlib.pyplot as plt
 import pyRofex as pr
+import conexion
+#import datos_ticker
 
 # recibe argumentos al ejecutar el programa.
 parser = argparse.ArgumentParser(description='Robot de trading para Matba Rofex')
@@ -16,64 +18,10 @@ parser.add_argument('-p','--password')
 parser.add_argument('-e','--environment', help='Environment LIVE or REMARKET. Por defecto es REMARKET')
 args = parser.parse_args()
 
-#se conecta, o no.
-if(str(args.environment).upper()=='LIVE'): 
+conexion.conexion.iniciar(user=str(args.user), password=str(args.password), account=str(args.account), environment=str(args.environment))
+while True:
     try:
-        pr.initialize(
-            user=args.user,
-            password=args.password,
-            account=args.account,
-            environment=pr.Environment.LIVE,
-        )
-        print('Conexión establecida en el entorno LIVE.')
-    except Exception as error:
-        print('Fallo de autenticación del entorno LIVE.')
-        print(error)
-        parser.print_help()
-        exit()
-else:
-    try:
-        pr.initialize(
-            user=args.user,
-            password=args.password,
-            account=args.account,
-            environment=pr.Environment.REMARKET,
-        )
-        print('Conexión establecida en el entorno REMARKET.')
-    except Exception as error:
-        print('Fallo de autenticación del entorno REMARKET.')
-        print(error)
-        parser.print_help()
-        exit()
-
-def market_data_handler(message):
-    print("Market Data Message Received: {0}".format(message))
-def order_report_handler(message):
-    print("Order Report Message Received: {0}".format(message))
-def error_handler(message):
-    print("Error Message Received: {0}".format(message))
-def exception_handler(e):
-    print("Exception Occurred: {0}".format(e.message))
-
-# Initiate Websocket Connection
-pr.init_websocket_connection(
-    market_data_handler=market_data_handler,
-    order_report_handler=order_report_handler,
-    error_handler=error_handler,
-    exception_handler=exception_handler,
-)
-
-datos_ticker = [
-    pr.MarketDataEntry.BIDS,
-    pr.MarketDataEntry.OFFERS,
-    pr.MarketDataEntry.LAST,
-]
-lista_tickers = [args.ticker]
-
-pr.market_data_subscription(
-    tickers=lista_tickers,
-    entries=datos_ticker,
-)
-
-time.sleep(1)
-pr.close_websocket_connection()
+        time.sleep(1)
+    except KeyboardInterrupt:
+        print("Saliendo...")
+        break
