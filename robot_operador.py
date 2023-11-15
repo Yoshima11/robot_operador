@@ -1,6 +1,7 @@
 import sys
 import argparse #para ingresar argumentos al iniciar el programa
 import time
+import keyboard
 from datetime import datetime
 import pandas as pd
 import simplejson as sj
@@ -15,10 +16,10 @@ parser.add_argument('-p','--password')
 parser.add_argument('-e','--environment', help='Environment LIVE o REMARKET. Por defecto es REMARKET')
 args = parser.parse_args()
 
-dat_inst = ''
-dat_old_inst = ''
-dat_ord = ''
-dat_old_ord = ''
+dat_inst = {}
+dat_old_inst = {}
+dat_ord = {}
+dat_old_ord = {}
 
 def env(env):
     if(str(env).upper()=='LIVE'):
@@ -60,26 +61,61 @@ entr=[
 ]
 
 def market_data_handler(message):
-    global dat_inst
-    dat_inst = message
+    print('\nmarket data handler')
+    global dat_ord
+    dat_ord = message
 def order_report_handler(message):
+    print('\nmarket order handler')
     global dat_ord
     dat_ord = message
 def error_handler(message):
     print("Error Message Received: {0}".format(message))
 def exception_handler(e):
     print("Exception Occurred: {0}".format(e.message))
-
+def inst_data_handler(message):
+    print('\nInstrumento data handler')
+    global dat_inst
+    dat_inst = message
 pr.init_websocket_connection(
     market_data_handler=market_data_handler,
     order_report_handler=order_report_handler,
     error_handler=error_handler,
     exception_handler=exception_handler
 )
+print('websocket conectado')
 # reporte de instrumento
 pr.market_data_subscription(
+    handler=inst_data_handler,
     tickers=inst,
     entries=entr,
 )
 # reporte de ordenes
-pr.order_report_subscription()
+pr.order_report_subscription(snapshot=True)
+precio = 10
+while True:
+    try:
+        if(dat_old_inst != dat_inst):
+            dat_old_inst = dat_inst
+            print(dat_inst)
+        if(dat_old_ord != dat_ord):
+            dat_old_ord = dat_ord
+            print(dat_ord)
+        order = pr.send_order(
+            ticker=args.ticker,
+            side=pr.Side.BUY,
+            size=10,
+            price=precio+1,
+            order_type=pr.OrderType.LIMIT,
+        )
+        print('orden enviada', order)
+        time.sleep(2)
+        cancel_order = pr.cancel_order(order["order"]["clientId"])
+        print('orden cancelada')
+        time.sleep(2)
+        input('Enter para enviar una orden, Ctrl+C para salir.')
+    except (Exception, KeyboardInterrupt):
+        print("\nSaliendo...")
+        break
+
+pr.close_websocket_connection()
+print('cerrado websocker conexion.')
