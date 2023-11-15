@@ -83,24 +83,3 @@ pr.market_data_subscription(
 )
 # reporte de ordenes
 pr.order_report_subscription()
-
-while True:
-    try:
-        #datos = pd.DataFrame.from_dict(pr.get_market_data(args.ticker, entradas)) Pedir datos de ticker
-        input('Enter para enviar una orden. Ctrl+C para salir')
-        if(dat_old_inst != dat_inst):
-            dat_old_inst = dat_inst
-            print(pd.DataFrame.from_dict(dat_inst))
-        if(dat_old_ord != dat_ord):
-            dat_old_ord = dat_ord
-            print(pd.DataFrame.from_dict(dat_ord))
-        order = pr.send_order(
-            ticker=args.ticker,
-            side=pr.Side.BUY,
-            size=2,
-            price=55.8,
-            order_type=pr.OrderType.LIMIT,
-        )
-    except KeyboardInterrupt:
-        print("Saliendo...")
-        exit()
