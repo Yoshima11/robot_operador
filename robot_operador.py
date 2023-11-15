@@ -16,10 +16,10 @@ parser.add_argument('-p','--password')
 parser.add_argument('-e','--environment', help='Environment LIVE o REMARKET. Por defecto es REMARKET')
 args = parser.parse_args()
 
-dat_inst = {}
-dat_old_inst = {}
-dat_ord = {}
-dat_old_ord = {}
+dat_inst = 1
+dat_old_inst = 0
+dat_ord = 1
+dat_old_ord = 0
 
 def env(env):
     if(str(env).upper()=='LIVE'):
@@ -61,11 +61,9 @@ entr=[
 ]
 
 def market_data_handler(message):
-    print('\nmarket data handler')
-    global dat_ord
-    dat_ord = message
+    global dat_inst
+    dat_inst = message
 def order_report_handler(message):
-    print('\nmarket order handler')
     global dat_ord
     dat_ord = message
 def error_handler(message):
@@ -73,7 +71,7 @@ def error_handler(message):
 def exception_handler(e):
     print("Exception Occurred: {0}".format(e.message))
 def inst_data_handler(message):
-    print('\nInstrumento data handler')
+    print('\nInstrumento data handler', message)
     global dat_inst
     dat_inst = message
 pr.init_websocket_connection(
@@ -90,29 +88,32 @@ pr.market_data_subscription(
     entries=entr,
 )
 # reporte de ordenes
-pr.order_report_subscription(snapshot=True)
+pr.order_report_subscription()
 precio = 10
 while True:
     try:
+        precio = precio + 1
+        order = pr.send_order(
+            ticker=args.ticker,
+            side=pr.Side.BUY,
+            size=10,
+            price=precio,
+            order_type=pr.OrderType.LIMIT,
+        )
+        if(dat_old_ord != dat_ord):
+            dat_old_ord = dat_ord
+            print(dat_ord)
+        time.sleep(2)
+        cancel_order = pr.cancel_order(order["order"]["clientId"])
+        print('orden cancelada')
+        time.sleep(2)
         if(dat_old_inst != dat_inst):
             dat_old_inst = dat_inst
             print(dat_inst)
         if(dat_old_ord != dat_ord):
             dat_old_ord = dat_ord
             print(dat_ord)
-        order = pr.send_order(
-            ticker=args.ticker,
-            side=pr.Side.BUY,
-            size=10,
-            price=precio+1,
-            order_type=pr.OrderType.LIMIT,
-        )
-        print('orden enviada', order)
-        time.sleep(2)
-        cancel_order = pr.cancel_order(order["order"]["clientId"])
-        print('orden cancelada')
-        time.sleep(2)
-        input('Enter para enviar una orden, Ctrl+C para salir.')
+        input('Enter para enviar una orden, Ctrl+C para salir.\n\n')
     except (Exception, KeyboardInterrupt):
         print("\nSaliendo...")
         break
