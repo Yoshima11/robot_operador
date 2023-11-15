@@ -1,1 +1,0 @@
-#implementar funcion para datos en tiempo real.
