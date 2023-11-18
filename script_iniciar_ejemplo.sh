@@ -1,1 +1,0 @@
-exec python robot_operador.py -t DLR/ENE24 -u nombre_usuaro -a cuenta -p clave -e remarket
