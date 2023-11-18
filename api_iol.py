@@ -12,5 +12,4 @@ def connect_iol(user, password):
     }
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
     ret = requests.post(url=urls.token, data=data, headers=headers, timeout=10)
-    return json.loads(ret.text)
-
+    return ret
